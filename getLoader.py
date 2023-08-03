@@ -118,7 +118,7 @@ def getLoader(rootFolder,
                         pin_memory=pinMemory,
                         collate_fn=MyCollate(padIDX=padIDX)
                         )
-    return loader
+    return loader, dataset
 
 transformsComposition = transforms.Compose([
     transforms.Resize((224, 224)), 
@@ -126,9 +126,14 @@ transformsComposition = transforms.Compose([
 )
 
 
-dataLoader = getLoader("data/Images", annotationFile="data/captions.txt", transform=transformsComposition)
+if __name__ == "__main__":
+    transformsComposition = transforms.Compose([
+    transforms.Resize((224, 224)), 
+    transforms.ToTensor()]
+)
+    dataLoader = getLoader("data/Images", annotationFile="data/captions.txt", transform=transformsComposition)
 
-for idx, (imgs, captions) in enumerate(dataLoader):
-    print(imgs.shape)
-    print(captions.shape)
+    for idx, (imgs, captions) in enumerate(dataLoader):
+        print(imgs.shape)
+        print(captions.shape)
 
