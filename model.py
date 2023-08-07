@@ -75,7 +75,8 @@ class CNNtoRNN(nn.Module):
             for _ in range(maxLenght):
                 hiddens, states = self.decoderRNN.lstm(x, states)
                 output = self.decoderRNN.linear(hiddens.squeeze(0))
-                perdicted = output.argmax(1)
+                #print(output)
+                perdicted = output.argmax(0)
 
                 resultCaption.append(perdicted.item())
 

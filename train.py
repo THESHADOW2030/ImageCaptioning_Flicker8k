@@ -8,6 +8,8 @@ from getLoader import getLoader
 from model import CNNtoRNN
 from tqdm import tqdm
 
+from PIL import Image
+
 
 def train():
     trasnform = trasnforms.Compose(
@@ -78,4 +80,44 @@ def train():
 
 
 if __name__ == "__main__":
-    train()
+    #train()
+    trainMode = False
+    if trainMode:
+        print("Training")
+        train()
+    else:
+
+
+        transform = trasnforms.Compose(
+            [
+                trasnforms.Resize((356, 356)),
+                trasnforms.RandomCrop(299, 299), 
+                trasnforms.ToTensor(),
+                trasnforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            ]
+        )
+        dataset = getLoader(
+            rootFolder="./data/Images",
+            annotationFile="./data/captions.txt",
+            transform=transform,
+            numWorkers=2
+        )[1]
+
+        model = CNNtoRNN(embedSize=256, hiddenSize=256, vocabSize=len(dataset.vocab), numLayers=1)
+        model.eval()
+        model.load_state_dict(torch.load("my_checkpoint.pth.tar")["state_dict"])
+    
+
+        imageDog = Image.open("./data/test/dog.png").convert("RGB")
+ 
+        imageDog = transform(imageDog).unsqueeze(0)
+        print(" ".join(model.captionImage(imageDog, dataset.vocab)))
+
+
+        imageSapeinza = Image.open("./data/test/sapienza.jpg").convert("RGB")
+
+        imageSapeinza = transform(imageSapeinza).unsqueeze(0)
+        print(" ".join(model.captionImage(imageSapeinza, dataset.vocab)))
+
+
+
